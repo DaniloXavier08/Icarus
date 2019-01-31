@@ -25,6 +25,11 @@
         android:layout_height="wrap_content"
         android:text="@string/pause" />
 
+    <Button
+        android:id="@+id/open"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/open" />
 
     <ListView
         android:id="@+id/lista_arquivos"
