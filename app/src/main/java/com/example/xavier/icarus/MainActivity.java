@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.midisheetmusic.FileUri;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,16 +35,6 @@ public class MainActivity extends AppCompatActivity {
         // Set Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Floating Action button
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Play foi acionado!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Media Player stuff
         mediaPlayer = MediaPlayer.create(this, R.raw.happy_birthday);
@@ -90,11 +82,23 @@ public class MainActivity extends AppCompatActivity {
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
-            Uri uri = null;
+
+            //Uri uri = null;
             if (resultData != null) {
-                uri = resultData.getData();
+                /*uri = resultData.getData();
                 Toast.makeText(MainActivity.this, resultData.toString(), Toast.LENGTH_LONG).show();
-                mediaPlayer = MediaPlayer.create(this, uri);
+                mediaPlayer = MediaPlayer.create(this, uri);*/
+
+
+                Uri uri = resultData.getData();
+                FileUri file = new FileUri(uri.toString());
+                byte[] data = file.getData();
+
+
+                Intent intent = new Intent(this, SheetMusicActivity.class);
+                intent.putExtra(SheetMusicActivity.MidiDataID, data);
+                intent.putExtra(SheetMusicActivity.MidiTitleID, file.toString());
+                startActivity(intent);
             }
         }
     }
@@ -150,6 +154,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    /**
+     * Open the MIDI file on a new Activity to show Sheet Music
+     */
+    protected void playSheetMusic() {
+
+
     }
 
 
