@@ -18,8 +18,10 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int READ_REQUEST_CODE = 42;
+
     // MediaPlayer is responsable to run MIDI
-    MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +48,13 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer = MediaPlayer.create(this, R.raw.happy_birthday);
 
         // Button stuff
-        Button buttonPlay = findViewById(R.id.play);
-        Button buttonPause = findViewById(R.id.pause);
-        buttonPlay.setOnClickListener(buttonPlayOnClickListener);
-        buttonPause.setOnClickListener(buttonPauseOnClickListener);
-
         Button buttonOpen = findViewById(R.id.open);
+        Button buttonPause = findViewById(R.id.pause);
+        Button buttonPlay = findViewById(R.id.play);
+
         buttonOpen.setOnClickListener(buttonOpenOnClickListener);
+        buttonPause.setOnClickListener(buttonPauseOnClickListener);
+        buttonPlay.setOnClickListener(buttonPlayOnClickListener);
 
     }
 
@@ -74,41 +76,8 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-    // Buttons onClick methods
-    Button.OnClickListener buttonPlayOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (!mediaPlayer.isPlaying()) {
-                try{
-                    mediaPlayer.start();
-                    Toast.makeText(MainActivity.this, "mediaPlayer.start()", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    };
-    Button.OnClickListener buttonPauseOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-                Toast.makeText(MainActivity.this, "mediaPlayer.pause()", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-
-    Button.OnClickListener buttonOpenOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v){
-            openMidiFile();
-        }
-    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
@@ -130,8 +99,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private static final int READ_REQUEST_CODE = 42;
+    /**
+     * Fires an intent to spin up the "file chooser" UI and select a MIDI file.
+     */
 
     protected void openMidiFile() {
         // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
@@ -150,5 +120,57 @@ public class MainActivity extends AppCompatActivity {
 
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
+
+    /**
+     * If the Media Player is playing stops the music.
+     */
+    protected void pauseMusic(){
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            Toast.makeText(MainActivity.this, "mediaPlayer.pause()", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Play the MIDI file, if it's not playing yet.
+     */
+    protected void playMusic() {
+        /*MidiParser mp = new MidiParser();
+        MusicXmlParserListener mxpl =
+                new MusicXmlParserListener();
+        mp.addParserListener(mxpl);
+        mp.parse(sequence);
+        String xml = mxpl.getMusicXml();*/
+
+        if (!mediaPlayer.isPlaying()) {
+            try{
+                mediaPlayer.start();
+                Toast.makeText(MainActivity.this, "mediaPlayer.start()", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    // Buttons onClick methods
+    Button.OnClickListener buttonOpenOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v){
+            openMidiFile();
+        }
+    };
+    Button.OnClickListener buttonPauseOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            pauseMusic();
+        }
+    };
+    Button.OnClickListener buttonPlayOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            playMusic();
+        }
+    };
 
 }
