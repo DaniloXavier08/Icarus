@@ -152,20 +152,20 @@ public class SheetMusicActivity extends Activity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-          case R.id.choose_song:
+        int i = item.getItemId();
+        if (i == R.id.choose_song) {
             chooseSong();
             return true;
-          case R.id.song_settings:
+        } else if (i == R.id.song_settings) {
             changeSettings();
             return true;
-          case R.id.save_images:
+        } else if (i == R.id.save_images) {
             showSaveImagesDialog();
             return true;
-          case R.id.help:
+        } else if (i == R.id.help) {
             showHelp();
             return true;
-          default:
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }
