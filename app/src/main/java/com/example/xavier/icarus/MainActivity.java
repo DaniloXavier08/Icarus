@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -21,9 +19,27 @@ import com.midisheetmusic.FileUri;
 public class MainActivity extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
-
+    // Buttons onClick methods
+    Button.OnClickListener buttonOpenOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openMidiFile();
+        }
+    };
     // MediaPlayer is responsable to run MIDI
     private MediaPlayer mediaPlayer;
+    Button.OnClickListener buttonPauseOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            pauseMusic();
+        }
+    };
+    Button.OnClickListener buttonPlayOnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            playMusic();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +107,17 @@ public class MainActivity extends AppCompatActivity {
 
 
                 Uri uri = resultData.getData();
-                FileUri file = new FileUri(uri.toString());
-                byte[] data = file.getData();
+                try {
+                    FileUri file = new FileUri(uri.toString());
+                    byte[] data = file.getData();
 
-
-                Intent intent = new Intent(this, SheetMusicActivity.class);
-                intent.putExtra(SheetMusicActivity.MidiDataID, data);
-                intent.putExtra(SheetMusicActivity.MidiTitleID, file.toString());
-                startActivity(intent);
+                    Intent intent = new Intent(this, SheetMusicActivity.class);
+                    intent.putExtra(SheetMusicActivity.MidiDataID, data);
+                    intent.putExtra(SheetMusicActivity.MidiTitleID, file.toString());
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "erro: " + e.toString(), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
@@ -128,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * If the Media Player is playing stops the music.
      */
-    protected void pauseMusic(){
+    protected void pauseMusic() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             Toast.makeText(MainActivity.this, "mediaPlayer.pause()", Toast.LENGTH_SHORT).show();
@@ -139,15 +158,9 @@ public class MainActivity extends AppCompatActivity {
      * Play the MIDI file, if it's not playing yet.
      */
     protected void playMusic() {
-        /*MidiParser mp = new MidiParser();
-        MusicXmlParserListener mxpl =
-                new MusicXmlParserListener();
-        mp.addParserListener(mxpl);
-        mp.parse(sequence);
-        String xml = mxpl.getMusicXml();*/
 
         if (!mediaPlayer.isPlaying()) {
-            try{
+            try {
                 mediaPlayer.start();
                 Toast.makeText(MainActivity.this, "mediaPlayer.start()", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
@@ -163,26 +176,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
-    // Buttons onClick methods
-    Button.OnClickListener buttonOpenOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v){
-            openMidiFile();
-        }
-    };
-    Button.OnClickListener buttonPauseOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            pauseMusic();
-        }
-    };
-    Button.OnClickListener buttonPlayOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            playMusic();
-        }
-    };
 
 }
