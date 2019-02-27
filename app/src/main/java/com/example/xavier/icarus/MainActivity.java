@@ -105,17 +105,9 @@ public class MainActivity extends AppCompatActivity {
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
-
-            //Uri uri = null;
             if (resultData != null) {
-                /*uri = resultData.getData();
-                Toast.makeText(MainActivity.this, resultData.toString(), Toast.LENGTH_LONG).show();
-                mediaPlayer = MediaPlayer.create(this, uri);*/
-
-
-                Uri uri = resultData.getData();
                 try {
-                    File f = new File(uri.toString());
+                    Uri uri = resultData.getData();
                     FileUri file = new FileUri(this.getContentResolver(), uri, MediaStore.MediaColumns.DISPLAY_NAME);
                     byte[] data = file.getData();
 
