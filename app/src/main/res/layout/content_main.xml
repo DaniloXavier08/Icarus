@@ -3,8 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="16dp">
+    android:layout_margin="16dp"
+    android:orientation="vertical">
 
 
     <TextView
@@ -16,8 +16,8 @@
         android:id="@+id/play"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/play"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:text="@string/play" />
 
     <Button
         android:id="@+id/pause"
@@ -32,10 +32,8 @@
         android:text="@string/open" />
 
     <ListView
-        android:id="@+id/lista_arquivos"
+        android:id="@+id/file_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </ListView>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

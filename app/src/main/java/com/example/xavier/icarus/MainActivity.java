@@ -1,10 +1,14 @@
 package com.example.xavier.icarus;
 
 import android.app.Activity;
+import android.app.ListActivity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,6 +18,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.midisheetmusic.FileUri;
+
+import java.io.File;
+import java.io.InputStream;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -108,7 +115,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Uri uri = resultData.getData();
                 try {
-                    FileUri file = new FileUri(uri.toString());
+                    File f = new File(uri.toString());
+                    FileUri file = new FileUri(this.getContentResolver(), uri, MediaStore.MediaColumns.DISPLAY_NAME);
                     byte[] data = file.getData();
 
                     Intent intent = new Intent(this, SheetMusicActivity.class);
