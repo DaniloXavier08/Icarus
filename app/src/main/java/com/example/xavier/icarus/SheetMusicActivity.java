@@ -62,10 +62,18 @@ public class SheetMusicActivity extends Activity {
         String json = settings.getString("" + midiCRC, null);
         MidiOptions savedOptions = MidiOptions.fromJson(json);
         if (savedOptions != null) {
-            //options.merge(savedOptions);
+            options.merge(savedOptions);
         }
         createView();
         createSheetMusic(options);
+    }
+
+    /**
+     * Pause the music if the user backs to main activity.
+     */
+    public void onStop(){
+        super.onStop();
+        player.Pause();
     }
 
     /**
