@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SheetMusicActivity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="sensorLandscape">
         </activity>
     </application>
 
