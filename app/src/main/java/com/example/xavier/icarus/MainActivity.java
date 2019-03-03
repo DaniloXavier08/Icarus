@@ -1,52 +1,44 @@
 package com.example.xavier.icarus;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
-import android.media.MediaPlayer;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.midisheetmusic.FileUri;
+import com.midisheetmusic.IconArrayAdapter;
 
-import java.io.File;
-import java.io.InputStream;
-
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
-    // Buttons onClick methods
-    Button.OnClickListener buttonOpenOnClickListener = new Button.OnClickListener() {
+
+    // Button onClick methods.
+    FloatingActionButton.OnClickListener fabOpenOnClickListener = new FloatingActionButton.OnClickListener() {
         @Override
         public void onClick(View v) {
             openMidiFile();
         }
     };
-    // MediaPlayer is responsable to run MIDI
-    private MediaPlayer mediaPlayer;
-    Button.OnClickListener buttonPauseOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            pauseMusic();
-        }
-    };
-    Button.OnClickListener buttonPlayOnClickListener = new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            playMusic();
-        }
-    };
+
+    /**
+     * The complete list of midi files
+     */
+    private ArrayList<FileUri> songList;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +51,22 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Media Player stuff
-        mediaPlayer = MediaPlayer.create(this, R.raw.happy_birthday);
+        // Set files list
+        listView = findViewById(R.id.file_list);
+        loadList();
+        IconArrayAdapter<FileUri> adapter = new IconArrayAdapter<>(this, R.id.file_list, songList);
+        listView.setAdapter(adapter);
+        listView.setClickable(true);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView parent, View v, int position, long id) {
+                FileUri fileUri = (FileUri) listView.getAdapter().getItem(position);
+                openSheetMusic(fileUri);
+            }
+        });
 
         // Button stuff
-        Button buttonOpen = findViewById(R.id.open);
-        Button buttonPause = findViewById(R.id.pause);
-        Button buttonPlay = findViewById(R.id.play);
-
-        buttonOpen.setOnClickListener(buttonOpenOnClickListener);
-        buttonPause.setOnClickListener(buttonPauseOnClickListener);
-        buttonPlay.setOnClickListener(buttonPlayOnClickListener);
-
+        FloatingActionButton buttonOpen = findViewById(R.id.open);
+        buttonOpen.setOnClickListener(fabOpenOnClickListener);
     }
 
     @Override
@@ -109,14 +105,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Uri uri = resultData.getData();
                     FileUri file = new FileUri(this.getContentResolver(), uri, MediaStore.MediaColumns.DISPLAY_NAME);
-                    byte[] data = file.getData();
-
-                    Intent intent = new Intent(this, SheetMusicActivity.class);
-                    intent.putExtra(SheetMusicActivity.MidiDataID, data);
-                    intent.putExtra(SheetMusicActivity.MidiTitleID, file.toString());
-                    startActivity(intent);
+                    openSheetMusic(file);
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "erro: " + e.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Erro: " + e.toString(), Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -125,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Fires an intent to spin up the "file chooser" UI and select a MIDI file.
      */
-
     protected void openMidiFile() {
         // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
         // browser.
@@ -145,36 +135,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * If the Media Player is playing stops the music.
+     * Load all the sample midi songs from the assets directory into songList.
+     * Look for files ending with ".mid"
      */
-    protected void pauseMusic() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            Toast.makeText(MainActivity.this, "mediaPlayer.pause()", Toast.LENGTH_SHORT).show();
-        }
-    }
+    void loadList() {
+        songList = new ArrayList<>();
 
-    /**
-     * Play the MIDI file, if it's not playing yet.
-     */
-    protected void playMusic() {
-
-        if (!mediaPlayer.isPlaying()) {
-            try {
-                mediaPlayer.start();
-                Toast.makeText(MainActivity.this, "mediaPlayer.start()", Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+        try {
+            AssetManager assets = this.getResources().getAssets();
+            String files[] = assets.list("");
+            if (files != null) {
+                for (String file : files) {
+                    if (file.endsWith(".mid")) {
+                        FileUri uri = new FileUri(assets, file, file);
+                        songList.add(uri);
+                    }
+                }
             }
+        } catch (Exception e) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG + 20).show();
         }
+        Collections.sort(songList, songList.get(0));
     }
 
     /**
-     * Open the MIDI file on a new Activity to show Sheet Music
+     * Open a MIDI file on Sheet Music Activity.
+     *
+     * @param file A file URI
      */
-    protected void playSheetMusic() {
+    private void openSheetMusic(FileUri file) {
+        try {
+            byte[] data = file.getData();
 
+            Intent intent = new Intent(this, SheetMusicActivity.class);
+            intent.putExtra(SheetMusicActivity.MidiDataID, data);
+            intent.putExtra(SheetMusicActivity.MidiTitleID, file.toString());
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
 
     }
-
 }

@@ -451,5 +451,16 @@ public class ChooseSongActivity extends ListActivity implements TextWatcher {
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+    public ArrayList<FileUri> getSonglist() {
+        songlist = new ArrayList<FileUri>();
+        loadAssetMidiFiles();
+        // Sort the songlist by name
+        Collections.sort(songlist, songlist.get(0));
+
+
+
+        return songlist;
+    }
 }
 

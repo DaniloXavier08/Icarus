@@ -28,7 +28,7 @@ import android.graphics.*;
  *  to the left side of each item displayed.
  *  Midi files show a NotePair icon.
  */
-class IconArrayAdapter<T> extends ArrayAdapter<T> {
+public class IconArrayAdapter<T> extends ArrayAdapter<T> {
     private LayoutInflater inflater;
     private static Bitmap midiIcon;       /* The midi icon */
     private static Bitmap directoryIcon;  /* The directory icon */
@@ -37,7 +37,7 @@ class IconArrayAdapter<T> extends ArrayAdapter<T> {
     public void LoadImages(Context context) {
         if (midiIcon == null) {
             Resources res = context.getResources();
-            midiIcon = BitmapFactory.decodeResource(res, R.drawable.notepair);
+            midiIcon = BitmapFactory.decodeResource(res, R.drawable.note_list);
             directoryIcon = BitmapFactory.decodeResource(res, R.drawable.directoryicon);
         }
     }

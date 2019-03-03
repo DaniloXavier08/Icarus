@@ -17,8 +17,6 @@ import android.content.res.*;
 import java.io.*;
 import java.util.*;
 import android.net.*;
-import android.provider.*;
-import android.widget.Toast;
 
 
 /** @class FileUri
@@ -144,7 +142,6 @@ public class FileUri implements Comparator<FileUri> {
             return data;
         }
         catch (Exception e) {
-            Toast.makeText(null, e.toString(), Toast.LENGTH_SHORT).show();
             return null;
         }
     }
