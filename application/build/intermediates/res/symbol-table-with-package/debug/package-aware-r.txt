@@ -16,6 +16,7 @@ drawable icon
 drawable main_background
 drawable menu_refresh
 drawable nine
+drawable note_list
 drawable notepair
 drawable pause
 drawable play

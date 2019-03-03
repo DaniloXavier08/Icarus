@@ -220,13 +220,30 @@ public class MidiPlayer extends LinearLayout {
 
         /* Create the Speed bar */
         speedText = new TextView(context);
-        speedText.setText("   Speed:    ");
+        speedText.setText("Speed: 100%");
+        speedText.setTextColor(Color.WHITE);
         speedText.setGravity(Gravity.CENTER);
         this.addView(speedText);
 
         speedBar = new SeekBar(context);
-        speedBar.setMax(100);
+        speedBar.setMax(200);
         speedBar.setProgress(100);
+        speedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                speedText.setText(String.format("Speed: %03d%%",seekBar.getProgress()));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         this.addView(speedBar);
 
         /* Initialize the timer used for playback, but don't start

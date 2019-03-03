@@ -1,8 +1,8 @@
 package com.example.xavier.icarus;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -17,7 +17,7 @@ import com.midisheetmusic.TimeSigSymbol;
 
 import java.util.zip.CRC32;
 
-public class SheetMusicActivity extends Activity {
+public class SheetMusicActivity extends AppCompatActivity {
 
     public static final String MidiDataID = "MidiDataID";
     public static final String MidiTitleID = "MidiTitleID";
@@ -41,10 +41,10 @@ public class SheetMusicActivity extends Activity {
         // Parse the MidiFile from the ray bytes
         byte[] data = this.getIntent().getByteArrayExtra(MidiDataID);
         String title = this.getIntent().getStringExtra(MidiTitleID);
-        this.setTitle("MidiSheetMusic: " + title);
-        try{
+        this.setTitle(title);
+        try {
             midiFile = new MidiFile(data, title);
-        } catch (MidiFileException e){
+        } catch (MidiFileException e) {
             this.finish();
             return;
         }
@@ -71,7 +71,7 @@ public class SheetMusicActivity extends Activity {
     /**
      * Pause the music if the user backs to main activity.
      */
-    public void onStop(){
+    public void onStop() {
         super.onStop();
         player.Pause();
     }
@@ -79,20 +79,23 @@ public class SheetMusicActivity extends Activity {
     /**
      * Create the Midi Player view
      */
-    private void createView () {
+    private void createView() {
         layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        player = new MidiPlayer(this);
+
         piano = new Piano(this);
+        player = new MidiPlayer(this);
+        player.SetPiano(piano);
         layout.addView(player);
         layout.addView(piano);
+
         setContentView(layout);
-        player.SetPiano(piano);
         layout.requestLayout();
     }
 
     /**
      * Create the Sheet Music view with the given options.
+     *
      * @param options
      */
     private void createSheetMusic(MidiOptions options) {
@@ -101,8 +104,7 @@ public class SheetMusicActivity extends Activity {
         }
         if (!options.showPiano) {
             piano.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             piano.setVisibility(View.VISIBLE);
         }
         sheet = new SheetMusic(this);
