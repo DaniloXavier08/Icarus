@@ -3,8 +3,8 @@
     <string name="app_name">MidiSheetMusic</string>
     <string name="choose_song">Choose Song</string>
     <string name="song_settings_str">Song Settings</string>
-    <string name="save_images_str">Save As Images</string>
-    <string name="save_images_descr_str">Save the sheet music as images, in the directory /Pictures/MidiSheetMusic, with the following filename</string>
+    <string name="save_images_str">Salvar como imagem</string>
+    <string name="save_images_descr_str">Salvar partitura como imagens no diretório /Pictures/Icarus, com o seguinte nome</string>
     <string name="help_str">Help</string>
     <string name="sheet_prefs_title">Sheet Music Preferences</string>
     <string name="restore_defaults">Restore Default Settings</string>

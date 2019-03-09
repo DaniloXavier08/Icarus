@@ -1,9 +1,18 @@
 package com.example.xavier.icarus;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.midisheetmusic.ClefSymbol;
@@ -15,6 +24,12 @@ import com.midisheetmusic.Piano;
 import com.midisheetmusic.SheetMusic;
 import com.midisheetmusic.TimeSigSymbol;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.zip.CRC32;
 
 public class SheetMusicActivity extends AppCompatActivity {
@@ -30,9 +45,22 @@ public class SheetMusicActivity extends AppCompatActivity {
     private MidiOptions options; /* The options for sheet music and sound */
     private long midiCRC;      /* CRC of the midi bytes */
 
+    private Button saveButton;
+    Button.OnClickListener onClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showSaveImagesDialog();
+        }
+    };
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        // Button stuff
+        saveButton = new Button(this);
+        saveButton.setText("Salvar");
+        saveButton.setOnClickListener(onClickListener);
 
         ClefSymbol.LoadImages(this);
         TimeSigSymbol.LoadImages(this);
@@ -85,6 +113,7 @@ public class SheetMusicActivity extends AppCompatActivity {
 
         piano = new Piano(this);
         player = new MidiPlayer(this);
+        player.addView(saveButton);
         player.SetPiano(piano);
         layout.addView(player);
         layout.addView(piano);
@@ -116,5 +145,74 @@ public class SheetMusicActivity extends AppCompatActivity {
         player.SetMidiFile(midiFile, options, sheet);
         layout.requestLayout();
         sheet.callOnDraw();
+    }
+
+
+
+
+    /* Show the "Save As Images" dialog */
+    private void showSaveImagesDialog() {
+        LayoutInflater inflator = LayoutInflater.from(this);
+        final View dialogView= inflator.inflate(com.midisheetmusic.R.layout.save_images_dialog, null);
+        final EditText filenameView = (EditText)dialogView.findViewById(com.midisheetmusic.R.id.save_images_filename);
+        filenameView.setText(midiFile.getFileName().replace("_", " ") );
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(com.midisheetmusic.R.string.save_images_str);
+        builder.setView(dialogView);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface builder, int whichButton) {
+                saveAsImages(filenameView.getText().toString());
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface builder, int whichButton) {
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    /* Save the current sheet music as PNG images. */
+    private void saveAsImages(String name) {
+        String filename = name;
+        try {
+            filename = URLEncoder.encode(name, "utf-8");
+        }
+        catch (UnsupportedEncodingException e) {
+        }
+        if (!options.scrollVert) {
+            options.scrollVert = true;
+            createSheetMusic(options);
+        }
+        try {
+            int numpages = sheet.GetTotalPages();
+            for (int page = 1; page <= numpages; page++) {
+                Bitmap image= Bitmap.createBitmap(SheetMusic.PageWidth + 40, SheetMusic.PageHeight + 40, Bitmap.Config.ARGB_8888);
+                Canvas imageCanvas = new Canvas(image);
+                sheet.DrawPage(imageCanvas, page);
+                File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/MidiSheetMusic");
+                File file = new File(path, "" + filename + page + ".png");
+                path.mkdirs();
+                OutputStream stream = new FileOutputStream(file);
+                image.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                image = null;
+                stream.close();
+
+                // Inform the media scanner about the file
+                MediaScannerConnection.scanFile(this, new String[] { file.toString() }, null, null);
+            }
+        }
+        catch (IOException e) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Error saving image to file " + Environment.DIRECTORY_PICTURES + "/MidiSheetMusic/" + filename  + ".png");
+            builder.setCancelable(false);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
     }
 }
